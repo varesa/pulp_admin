@@ -24,8 +24,14 @@ class PulpConnection():
 	def get(self, path):
 		return requests.get(self.url+path,auth=self.auth,verify="/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem")
 
+	def put(self, path, data=None):
+		return requests.get(self.url+path, auth=self.auth, verify="/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem")
+
 	def post(self, path, data=None):
 		return requests.post(self.url+path, data=data, auth=self.auth, verify="/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem")
+
+	def delete(self, path):
+		return requests.delete(self.url+path, auth=self.auth, verify="/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem")
 
 class Pulp():
 	def __init__(self, connection):
@@ -43,6 +49,10 @@ class Pulp():
 		result = self.connection.get("/pulp/api/v2/repositories/" + str(repo_id) + "/importers/")
 		return json.loads(result.text)
 
+	def update_importer(self, repo_id, importer_id, data):
+		result = self.connection.put("/pulp/api/v2/repositories/" + str(repo_id) + "/importers/" + str(importer_id) + "/", data=data)
+		return json.loads(result.text)
+
 	def get_distributors(self, repo_id):
 		result = self.connection.get("/pulp/api/v2/repositories/" + str(repo_id) + "/distributors/")
 		return json.loads(result.text)
@@ -53,7 +63,8 @@ class Pulp():
 			print("Repo id " + str(id) + " succesfully scheduled for syncing")
 		else:
 			print("Unable to schedule repo id " + str(id) + " for syncing")
-
+	
+	
 def pick_repo(pulp, multiple=False):
 	repos = pulp.get_repositories()
 	i = 1
@@ -99,12 +110,30 @@ def repos_sync(pulp):
 	for id in ids:
 		pulp.sync_repository(id)
 
+def repos_schedules(pulp):
+	repos = pulp.get_repositories()
+	for repo in repos:
+		importer0 = pulp.get_importers(repo['id'])[0]
+		print(repo['display_name'] + ":")
+		if len(importer0['scheduled_syncs']):
+			for sync in importer0['scheduled_syncs']:
+				print(" - " + sync)
+		else:
+			print(" - None")
+
+def repos_schedules_set(pulp):
+	ids = pick_repo(pulp, multiple=True)
+	schedule = input("Schedule?\n>")
+	for id in ids:
+		pulp.update_importer(id, "yum_importer", json.dumps({'importer_config': {'scheduled_syncs': [schedule]}}))		
 
 def mainmenu(pulp):
 	while True:
 		print("1) Repository overview")
 		print("2) Repository details")
 		print("3) Start sync")
+		print("4) Show schedules")
+		print("5) Set schedules")
 
 		print("q) Quit")
 
@@ -115,6 +144,10 @@ def mainmenu(pulp):
 			repos_details(pulp)
 		elif selection == '3':
 			repos_sync(pulp)
+		elif selection == '4':
+			repos_schedules(pulp)
+		elif selection == '5':
+			repos_schedules_set(pulp)
 		
 		elif selection == 'q':
 			break
