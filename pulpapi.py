@@ -73,8 +73,10 @@ def pick_repo(pulp, multiple=False):
 def repos_overview(pulp):
 	repos = pulp.get_repositories()
 	for repo in repos:
+		importer0 = pulp.get_importers(repo['id'])[0]
 		print(repo['display_name'] + ':')
 		print('\t' + str(repo['content_unit_counts']['rpm']) + " rpms")
+		print('\t' + "last synced: " + importer0['last_sync'])
 		print('\t' + "last added: " + repo['last_unit_added'])
 
 def repos_details(pulp):
