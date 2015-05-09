@@ -1,4 +1,7 @@
 #!/bin/env python3
+
+import getpass
+
 import requests
 import json
 
@@ -8,7 +11,7 @@ class Auth():
 		self.password = ""
 	def init(self):
 		self.username = input("Username?\n> ")
-		self.password = input("Password?\n> ")
+		self.password = getpass.getpass("Password?\n> ")
 	
 	def get_tuple(self):
 		return self.username, self.password
