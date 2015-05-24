@@ -88,11 +88,13 @@ def repos_overview(pulp):
 	for repo in repos:
 		importer0 = pulp.get_importers(repo['id'])[0]
 		print(repo['display_name'] + ':')
-		print('\t' + str(repo['content_unit_counts']['rpm']) + " rpms")
-		print('\t' + "last synced: " + importer0['last_sync'])
-		print('\t' + "last added: " + repo['last_unit_added'])
+		if 'rpm' in repo['content_unit_counts'].keys():
+			print('\t' + str(repo['content_unit_counts']['rpm']) + " rpms")
+		print('\t' + "last synced: " + str(importer0['last_sync']))
+		print('\t' + "last added: " + str(repo['last_unit_added']))
 
-		packages += repo['content_unit_counts']['rpm']
+		if 'rpm' in repo['content_unit_counts'].keys():
+			packages += repo['content_unit_counts']['rpm']
 	
 	print("\nTotal: " + str(packages) + " rpms in " + str(len(repos)) + " repositories.")
 
