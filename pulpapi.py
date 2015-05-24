@@ -4,6 +4,7 @@ import json
 
 from pulp_connection import PulpConnection
 from auth import Auth
+from repository import Repository
 
 class Pulp():
     def __init__(self, connection):
@@ -11,11 +12,15 @@ class Pulp():
 
     def get_repositories(self):
         result = self.connection.get("/pulp/api/v2/repositories/")
-        return json.loads(result.text)
+        repositories = []
+        for repo in json.loads(result.text):
+            repositories.append(Repository(repo, self.connection))
+        return repositories
     
     def get_repository(self, id):
         result = self.connection.get("/pulp/api/v2/repositories/" + str(id) + "/")
-        return json.loads(result.text)
+        repo = json.loads(result.text)
+        return Repository(repo, self.connection)
 
     def get_importers(self, repo_id):
         result = self.connection.get("/pulp/api/v2/repositories/" + str(repo_id) + "/importers/")
@@ -58,15 +63,17 @@ def repos_overview(pulp):
 
     repos = pulp.get_repositories()
     for repo in repos:
-        importer0 = pulp.get_importers(repo['id'])[0]
-        print(repo['display_name'] + ':')
-        if 'rpm' in repo['content_unit_counts'].keys():
-            print('\t' + str(repo['content_unit_counts']['rpm']) + " rpms")
-        print('\t' + "last synced: " + str(importer0['last_sync']))
-        print('\t' + "last added: " + str(repo['last_unit_added']))
+        repo = repo
+        """:type: Repository"""
+        importer0 = repo.get_importers()[0]
+        print(repo.display_name + ':')
+        if 'rpm' in repo.content_unit_counts.keys():
+            print('\t' + str(repo.content_unit_counts['rpm']) + " rpms")
+        print('\t' + "last synced: " + str(importer0.last_sync))
+        print('\t' + "last added: " + str(repo.last_unit_added))
 
-        if 'rpm' in repo['content_unit_counts'].keys():
-            packages += repo['content_unit_counts']['rpm']
+        if 'rpm' in repo.content_unit_counts.keys():
+            packages += repo.content_unit_counts['rpm']
     
     print("\nTotal: " + str(packages) + " rpms in " + str(len(repos)) + " repositories.")
 
@@ -87,10 +94,10 @@ def repos_sync(pulp):
 def repos_schedules(pulp):
     repos = pulp.get_repositories()
     for repo in repos:
-        importer0 = pulp.get_importers(repo['id'])[0]
-        print(repo['display_name'] + ":")
-        if len(importer0['scheduled_syncs']):
-            for sync in importer0['scheduled_syncs']:
+        importer0 = repo.get_importers()[0]
+        print(repo.display_name + ":")
+        if len(importer0.scheduled_syncs):
+            for sync in importer0.scheduled_syncs:
                 print(" - " + sync)
         else:
             print(" - None")
