@@ -42,7 +42,7 @@ class Menu:
         print("\nTotal: " + str(packages) + " rpms in " + str(len(repos)) + " repositories.")
     
     def repos_details(self):
-        repo = self.pulp.get_repository(self.pick_repo(self.pulp))
+        repo = self.pulp.get_repository(self.pick_repo())
         print("Repository details:")
         print(repo.dump())
         print("\nRepository importers:")
@@ -101,3 +101,4 @@ class Menu:
     
             else:
                 print("Invalid selection")
+
