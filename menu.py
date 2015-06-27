@@ -28,7 +28,7 @@ class Menu:
             else:
                 for num in selection.split(' '):
                     ids.append(repos[int(num)-1].id)
-                return ids
+            return ids
         else:
             return repos[int(selection)-1].id
 
@@ -88,11 +88,16 @@ class Menu:
     
     def repos_schedules_set(self):
         ids = self.pick_repo(multiple=True)
-        schedule = self.prompt("Schedule?")
+        newschedule = self.prompt("Schedule?")
         for id in ids:
             for importer in self.pulp.get_repository(id).get_importers():
-                for schedule in importer.get_schedules():
-                    schedule.delete()
+                oldschedules = importer.get_schedules()
+                if len(oldschedules) == 1 and oldschedules[0].schedule == newschedule:
+                    print("schedule not updated")
+                else:
+                    for schedule in oldschedules:
+                        schedule.delete()
+                    importer.create_schedule(newschedule)
     
     def mainmenu(self):
         while True:

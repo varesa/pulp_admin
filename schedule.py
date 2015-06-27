@@ -72,7 +72,8 @@ class Schedule:
 
     def dump(self):
         out = "- Schedule: " + self.schedule
-        out += ", last run: " + self.last_run_at
+        if self.last_run_at:
+            out += ", last run: " + self.last_run_at
         out += ", next run: " + self.next_run
         return out
 
