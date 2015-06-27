@@ -1,10 +1,13 @@
 import requests
 
-class PulpConnection():
-    def __init__(self, auth):
+class PulpConnection:
+    def __init__(self, auth, ca=None):
         self.url = "https://pulp.ikioma"
         self.auth = auth
-        self.ca = "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
+        if ca is None:
+            self.ca = "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
+        else:
+            self.ca = ca
 
     def get(self, path):
         return requests.get(self.url+path, auth=self.auth, verify=self.ca)
