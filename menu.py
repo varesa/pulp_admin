@@ -22,9 +22,13 @@ class Menu:
         selection = input('>')
         if multiple:
             ids = []
-            for num in selection.split(' '):
-                ids.append(repos[int(num)-1].id)
-            return ids
+            if selection == '*':
+                for repo in repos:
+                    ids.append(repo.id)
+            else:
+                for num in selection.split(' '):
+                    ids.append(repos[int(num)-1].id)
+                return ids
         else:
             return repos[int(selection)-1].id
 
