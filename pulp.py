@@ -13,6 +13,11 @@ class Pulp():
         return repositories
     
     def get_repository(self, repo_id):
+        """
+        :param repo_id:  Repository id
+        :type repo_id: string
+        :rtype: Repository
+        """
         result = self.connection.get("/pulp/api/v2/repositories/" + str(repo_id) + "/")
         repo = json.loads(result.text)
         return Repository(repo, self.connection)

@@ -47,6 +47,9 @@ class Schedule:
     args = None
     ":type: list"
 
+    connection = None
+    ":type: PulpConnection"
+
     def __init__(self, data, connection):
         self._id = data['_id']
         self.kwargs = data['kwargs']
@@ -65,8 +68,14 @@ class Schedule:
         self.resource = data['resource']
         self.args = data['args']
 
+        self.connection = connection
+
     def dump(self):
         out = "- Schedule: " + self.schedule
         out += ", last run: " + self.last_run_at
         out += ", next run: " + self.next_run
         return out
+
+    def delete(self):
+        self.connection.delete(self._href)
+        print(self._id + " deleted")

@@ -83,10 +83,12 @@ class Menu:
                         print(schedule.dump())
     
     def repos_schedules_set(self):
-        ids = self.pick_repo(self.pulp, multiple=True)
+        ids = self.pick_repo(multiple=True)
         schedule = self.prompt("Schedule?")
         for id in ids:
-            self.pulp.update_importer(id, "yum_importer", json.dumps({'importer_config': {'scheduled_syncs': [schedule]}}))        
+            for importer in self.pulp.get_repository(id).get_importers():
+                for schedule in importer.get_schedules():
+                    schedule.delete()
     
     def mainmenu(self):
         while True:
