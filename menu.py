@@ -75,13 +75,12 @@ class Menu:
     def repos_schedules(self):
         repos = self.pulp.get_repositories()
         for repo in repos:
-            importer0 = repo.get_importers()[0]
-            print(repo.display_name + ":")
-            if len(importer0.scheduled_syncs):
-                for sync in importer0.scheduled_syncs:
-                    print(" - " + sync)
-            else:
-                print(" - None")
+            importers = repo.get_importers()
+            if len(importers):
+                print(repo.display_name + ":")
+                for importer in importers:
+                    for schedule in importer.get_schedules():
+                        print(schedule.dump())
     
     def repos_schedules_set(self):
         ids = self.pick_repo(self.pulp, multiple=True)

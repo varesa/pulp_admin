@@ -1,3 +1,6 @@
+import json
+from schedule import Schedule
+
 class Importer:
     id = None
     repo_id = None
@@ -29,6 +32,13 @@ class Importer:
         self._ns = data['_ns']
 
         self.connection = connection
+
+    def get_schedules(self):
+        result = self.connection.get("/pulp/api/v2/repositories/" + self.repo_id + "/importers/" + self.id + "/schedules/sync/")
+        schedules = []
+        for sched in json.loads(result.text):
+            schedules.append(Schedule(sched, self.connection))
+        return schedules
 
     def dump(self):
         out =  "- id: " + str(self.id) + "\n"
