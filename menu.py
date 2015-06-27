@@ -73,7 +73,7 @@ class Menu:
     def repos_sync(self):
         ids = self.pick_repo(self.pulp)
         for id in ids:
-            self.pulp.sync_repository(id)
+            self.pulp.get_repository(id).sync()
     
     def repos_schedules(self):
         repos = self.pulp.get_repositories()

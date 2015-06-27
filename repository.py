@@ -72,7 +72,7 @@ class Repository:
     def sync(self):
         result = self.connection.post(self._href + "/actions/sync/")
         if result.status_code == 202:
-            print("Repo id " + str(id) + " successfully scheduled for syncing")
+            print("Repo id " + str(self.id) + " successfully scheduled for syncing")
         else:
             print("Unable to schedule repo id " + str(id) + " for syncing")
     
