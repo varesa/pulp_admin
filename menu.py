@@ -70,9 +70,8 @@ class Menu:
         feed = self.prompt("Feed []:")
         self.pulp.create_repository(id, display_name, description, feed)
 
-    
     def repos_sync(self):
-        ids = self.pick_repo(self.pulp, multiple=True)
+        ids = self.pick_repo(self.pulp)
         for id in ids:
             self.pulp.sync_repository(id)
     
